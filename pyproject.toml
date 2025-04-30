@@ -1,0 +1,15 @@
+[project]
+name = "langchain-practise"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "langchain>=0.3.24",
+    "langchain-community>=0.3.23",
+    "langchain-ollama>=0.3.2",
+    "langgraph>=0.3.34",
+    "langgraph-supervisor>=0.0.17",
+    "langgraph-swarm>=0.0.10",
+    "python-dotenv>=1.1.0",
+]
