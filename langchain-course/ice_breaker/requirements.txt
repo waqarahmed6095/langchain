@@ -1,0 +1,7 @@
+python-dotenv
+requests
+langchain
+langchain-core
+langchain-community
+langchain-ollama
+tavily-python
