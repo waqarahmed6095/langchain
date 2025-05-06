@@ -1,37 +1,48 @@
+from typing import Tuple
+
 from agents.linkedin_lookup_agent import lookup as linkedin_lookup_agent
 from agents.twitter_lookup_agent import lookup as twitter_lookup_agent
 from dotenv import load_dotenv
+from langchain_anthropic import ChatAnthropic
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import PromptTemplate
-from langchain_ollama import ChatOllama
+from output_parsers import Summary, summary_parser
 from third_parties.linkedn import scrape_linkedin_profile
 from third_parties.twitter import scrape_user_tweets
 
 
-def ice_break_with(name: str):
+def ice_break_with(name: str) -> Tuple[Summary, str]:
     linkedin_username = linkedin_lookup_agent(name=name)
     linkedin_data = scrape_linkedin_profile(linkedin_username)
     twitter_username = twitter_lookup_agent(name=name)
-    tweets = scrape_user_tweets(username=twitter_username)
+    tweets = scrape_user_tweets(username=name)
     summary_template = """
          given the information about a person from linkedin {information}, and latest twitter posts {twitter_posts} I want you to create:
          1. a short summary
          2. two interesting facts about them
 
-         Use both information from twitter and linkedn
+         Use both information from twitter and linkedn \n {format_instructions}
         /no_think.
      """
 
     summary_prompt_template = PromptTemplate(
-        input_variables=["information","twitter_posts"], template=summary_template
+        input_variables=["information", "twitter_posts"],
+        template=summary_template,
+        partial_variables={
+            "format_instructions": summary_parser.get_format_instructions()
+        },
     )
 
-    llm = ChatOllama(temperature=0, model="qwen3:4b", extract_reasoning=False)
-    chain = summary_prompt_template | llm | StrOutputParser()
+    llm = ChatAnthropic(model="claude-3-5-sonnet-20241022", temperature=0)
 
-    res = chain.invoke(input={"information": linkedin_data,"twitter_posts":tweets})
+    chain = summary_prompt_template | llm | summary_parser
 
-    print(res)
+    res: Summary = chain.invoke(
+        input={"information": linkedin_data, "twitter_posts": tweets}
+    )
+    print(linkedin_data.get("photoUrl"))
+
+    return res, linkedin_data.get("photoUrl")
 
 
 if __name__ == "__main__":
@@ -39,4 +50,4 @@ if __name__ == "__main__":
 
     load_dotenv()
 
-    ice_break_with(name="Soomal Jamali TRDP")  # Example name
+    ice_break_with(name="Eden Marco Udemy")  # Example name

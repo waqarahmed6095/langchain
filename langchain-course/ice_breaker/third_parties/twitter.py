@@ -34,7 +34,7 @@ def scrape_user_tweets(username, num_tweets=5, mock: bool = False):
                 id=user_id, max_results=num_tweets, exclude=["retweets", "replies"]
             )
         except:
-            tweets={}
+            tweets = {}
     for tweet in tweets:
         tweet_dict = {}
         tweet_dict["text"] = tweet["text"]
