@@ -11,8 +11,7 @@ from langchain_core.tools import Tool
 from langchain import hub
 from langchain.agents import AgentExecutor, create_react_agent
 
-# Add the parent directory to sys.path to make imports work when running directly
-sys.path.append(str(Path(__file__).parent.parent))
+
 from tool.tools import get_profile_url_tavily
 
 load_dotenv()
